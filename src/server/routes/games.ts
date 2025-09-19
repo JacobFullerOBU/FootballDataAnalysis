@@ -29,7 +29,7 @@ router.get('/week/:season/:week', async (req, res) => {
     
     query += ' ORDER BY g.game_date';
     
-    db.all(query, params, (err, rows) => {
+    db.all(query, params, (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -57,7 +57,7 @@ router.get('/:id', async (req, res) => {
       WHERE g.id = ?
     `;
     
-    db.get(query, [id], (err, row) => {
+    db.get(query, [id], (err: any, row: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -79,7 +79,7 @@ router.get('/recent/:limit?', async (req, res) => {
     const limit = parseInt(req.params.limit as string) || 10;
     const { type } = req.query;
     
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     let query = `
       SELECT g.*, 
@@ -101,7 +101,7 @@ router.get('/recent/:limit?', async (req, res) => {
     query += ' ORDER BY g.game_date DESC LIMIT ?';
     params.push(limit);
     
-    db.all(query, params, (err, rows) => {
+    db.all(query, params, (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -119,7 +119,7 @@ router.get('/upcoming/:limit?', async (req, res) => {
     const limit = parseInt(req.params.limit as string) || 10;
     const { type } = req.query;
     
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     let query = `
       SELECT g.*, 
@@ -141,7 +141,7 @@ router.get('/upcoming/:limit?', async (req, res) => {
     query += ' ORDER BY g.game_date ASC LIMIT ?';
     params.push(limit);
     
-    db.all(query, params, (err, rows) => {
+    db.all(query, params, (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;

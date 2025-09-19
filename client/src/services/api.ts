@@ -80,6 +80,30 @@ export const statsAPI = {
     const response = await api.get(`/stats/weekly/${season}/${week}/${type}`);
     return response.data as WeeklyAnalysis;
   },
+
+  // Update team stats for a specific game
+  updateTeamStats: async (gameId: number, teamId: number, statsData: Partial<TeamStats>): Promise<any> => {
+    const response = await api.put(`/stats/team/${gameId}/${teamId}`, statsData);
+    return response.data;
+  },
+
+  // Create new team stats
+  createTeamStats: async (statsData: Omit<TeamStats, 'id' | 'team_name' | 'team_abbr'>): Promise<any> => {
+    const response = await api.post('/stats/team', statsData);
+    return response.data;
+  },
+
+  // Update player stats for a specific game
+  updatePlayerStats: async (gameId: number, playerId: number, statsData: Partial<PlayerStats>): Promise<any> => {
+    const response = await api.put(`/stats/player/${gameId}/${playerId}`, statsData);
+    return response.data;
+  },
+
+  // Create new player stats
+  createPlayerStats: async (statsData: Omit<PlayerStats, 'id' | 'player_name' | 'position' | 'jersey_number' | 'team_name' | 'team_abbr'>): Promise<any> => {
+    const response = await api.post('/stats/player', statsData);
+    return response.data;
+  },
 };
 
 // Betting API
