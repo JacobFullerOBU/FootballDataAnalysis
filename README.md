@@ -24,6 +24,15 @@ For the easiest deployment without any server setup, use the static version:
 
 ✅ **All features work with realistic mock data!** See [STATIC_DEPLOYMENT.md](STATIC_DEPLOYMENT.md) for detailed instructions.
 
+### 🛠️ NPM-Free Alternatives
+
+**Don't want to use npm?** We have several alternatives:
+
+- **Static Build Script**: `./static-build.sh` - Creates standalone HTML/JS with no dependencies
+- **Yarn Alternative**: `./yarn-setup.sh` - Drop-in replacement for npm  
+- **Python Backend**: `./python-setup.sh` - Flask-based backend alternative
+- **Multiple Options**: See [NPM_ALTERNATIVES.md](NPM_ALTERNATIVES.md) for all options
+
 ### 🔧 Full Development Setup (With Backend)
 
 For development or custom data integration, follow the full setup instructions below.
@@ -76,6 +85,8 @@ See [DEMO.md](DEMO.md) for detailed demo documentation.
 ### Prerequisites
 - Node.js (v16 or higher)
 - npm or yarn
+
+**💡 Want alternatives to npm?** Check [NPM_ALTERNATIVES.md](NPM_ALTERNATIVES.md) for Python, static-only, and Yarn options.
 
 ### Quick Setup (Recommended)
 

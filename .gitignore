@@ -2,6 +2,12 @@
 node_modules/
 client/node_modules/
 
+# Python virtual environments
+python-backend/venv/
+python-backend/__pycache__/
+*.pyc
+*.pyo
+
 # Build outputs
 dist/
 client/dist/
