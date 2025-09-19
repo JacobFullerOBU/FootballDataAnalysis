@@ -1,1 +1,155 @@
 # FootballDataAnalysis
+
+A comprehensive web application for analyzing weekly NFL and college football games scores, statistics, and betting lines.
+
+## Features
+
+- **Dashboard**: Overview of recent and upcoming games with weekly analysis
+- **Games**: Detailed game schedules, scores, and results with filtering
+- **Teams**: Team profiles and information for NFL and college teams
+- **Analytics**: Statistical analysis and trends for teams and players
+- **Betting**: Betting lines comparison from multiple bookmakers
+
+## Technology Stack
+
+### Backend
+- **Node.js** with Express.js framework
+- **TypeScript** for type safety
+- **SQLite** database for data storage
+- **Automated data fetching** with scheduled jobs
+- **RESTful API** design
+
+### Frontend
+- **React** with TypeScript
+- **React Router** for navigation
+- **Axios** for API communication
+- **Responsive design** with custom CSS
+- **Modern UI** components
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/JacobFullerOBU/FootballDataAnalysis.git
+cd FootballDataAnalysis
+```
+
+2. Install backend dependencies:
+```bash
+npm install
+```
+
+3. Install frontend dependencies:
+```bash
+cd client
+npm install
+cd ..
+```
+
+4. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+### Development
+
+1. Start the development server (both backend and frontend):
+```bash
+npm run dev
+```
+
+This will start:
+- Backend server on http://localhost:3001
+- Frontend development server on http://localhost:3000
+
+2. Or start them separately:
+
+Backend only:
+```bash
+npm run dev:server
+```
+
+Frontend only:
+```bash
+npm run dev:client
+```
+
+### Production Build
+
+1. Build the application:
+```bash
+npm run build
+```
+
+2. Start the production server:
+```bash
+npm start
+```
+
+## API Endpoints
+
+### Games
+- `GET /api/games/week/:season/:week` - Get games for a specific week
+- `GET /api/games/recent/:limit?` - Get recent completed games
+- `GET /api/games/upcoming/:limit?` - Get upcoming scheduled games
+- `GET /api/games/:id` - Get specific game details
+
+### Teams
+- `GET /api/teams` - Get all teams (with optional type filter)
+- `GET /api/teams/:id` - Get specific team details
+- `GET /api/teams/:id/games/recent/:limit?` - Get team's recent games
+- `GET /api/teams/:id/games/upcoming/:limit?` - Get team's upcoming games
+
+### Statistics
+- `GET /api/stats/weekly/:season/:week/:type` - Get weekly analysis
+- `GET /api/stats/season/:season/:type` - Get season statistics
+- `GET /api/stats/game/:gameId` - Get game statistics
+- `GET /api/stats/players/:gameId` - Get player statistics
+
+### Betting
+- `GET /api/betting/upcoming/:type?` - Get upcoming games with betting lines
+- `GET /api/betting/game/:gameId` - Get betting lines for a specific game
+- `GET /api/betting/compare/:gameId` - Compare betting lines across bookmakers
+
+## Database Schema
+
+The application uses SQLite with the following main tables:
+- `teams` - Team information (NFL and college)
+- `games` - Game schedules and results
+- `players` - Player information
+- `player_stats` - Individual player statistics
+- `team_stats` - Team game statistics
+- `betting_lines` - Betting odds and lines
+
+## Data Sources
+
+The application currently uses sample data for demonstration. In production, it can be integrated with:
+- ESPN API for game data and statistics
+- The Odds API for betting lines
+- Sports Radar API for detailed statistics
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Development Notes
+
+- The backend includes automated data fetching scheduled to run daily at 6 AM
+- Sample data is automatically created on first run
+- The frontend uses responsive design principles for mobile and desktop
+- TypeScript is used throughout for better code quality and IDE support
