@@ -2,6 +2,25 @@
 
 A comprehensive web application for analyzing weekly NFL and college football games scores, statistics, and betting lines.
 
+## 🎯 Demo Available!
+
+**Try the demo with sample data right now!**
+
+```bash
+git clone https://github.com/JacobFullerOBU/FootballDataAnalysis.git
+cd FootballDataAnalysis
+./setup-demo.sh
+npm start
+```
+
+The demo includes:
+- 34 teams (20 NFL + 14 college)
+- 10 sample games (upcoming and completed)
+- Betting lines from multiple bookmakers
+- Complete API endpoints
+
+See [DEMO.md](DEMO.md) for detailed demo documentation.
+
 ## Features
 
 - **Dashboard**: Overview of recent and upcoming games with weekly analysis
