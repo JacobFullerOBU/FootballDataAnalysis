@@ -4,16 +4,22 @@
   "description": "Web application to analyze weekly NFL and college football games scores, stats, and betting lines",
   "main": "dist/server.js",
   "scripts": {
+    "postinstall": "npm run setup",
+    "setup": "npm run install:client && npm run setup:env",
+    "install:client": "cd client && npm install",
+    "setup:env": "node -e \"const fs = require('fs'); if (!fs.existsSync('.env')) { fs.copyFileSync('.env.example', '.env'); console.log('✓ Environment file created from .env.example'); } else { console.log('✓ Environment file already exists'); }\"",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "nodemon --exec ts-node src/server/server.ts",
-    "dev:client": "cd client && npm run dev",
+    "dev:client": "cd client && npm start",
     "build": "npm run build:server && npm run build:client",
     "build:server": "tsc -p src/server/tsconfig.json",
     "build:client": "cd client && npm run build",
     "start": "node dist/server.js",
     "test": "jest",
     "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix"
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "clean": "rm -rf dist client/build node_modules client/node_modules",
+    "fresh-install": "npm run clean && npm install"
   },
   "dependencies": {
     "express": "^4.18.2",

@@ -81,7 +81,7 @@ router.get('/recent/:limit?', async (req, res) => {
     const limit = parseInt(req.params.limit as string) || 10;
     const { type } = req.query;
     
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     let query = `
       SELECT g.*, 
@@ -121,7 +121,7 @@ router.get('/upcoming/:limit?', async (req, res) => {
     const limit = parseInt(req.params.limit as string) || 10;
     const { type } = req.query;
     
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     let query = `
       SELECT g.*, 

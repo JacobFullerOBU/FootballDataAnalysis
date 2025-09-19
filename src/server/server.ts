@@ -37,7 +37,7 @@ app.use(logger);
 app.locals.database = database;
 
 // Serve static files from client build
-app.use(express.static(path.join(__dirname, '../../client/dist')));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 // API Routes
 app.use('/api/games', gamesRouter);
@@ -58,7 +58,7 @@ app.get('/api/health', (req, res) => {
 
 // Serve client for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
 // Error handling
