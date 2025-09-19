@@ -1,14 +1,12 @@
 import express from 'express';
-import { Database } from '../services/database';
 
 const router = express.Router();
-const database = new Database();
 
 // Get team stats for a specific game
 router.get('/team/:gameId/:teamId', async (req, res) => {
   try {
     const { gameId, teamId } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     const query = `
       SELECT ts.*, t.name as team_name, t.abbreviation as team_abbr
@@ -17,7 +15,7 @@ router.get('/team/:gameId/:teamId', async (req, res) => {
       WHERE ts.game_id = ? AND ts.team_id = ?
     `;
     
-    db.get(query, [gameId, teamId], (err, row) => {
+    db.get(query, [gameId, teamId], (err: any, row: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -37,7 +35,7 @@ router.get('/team/:gameId/:teamId', async (req, res) => {
 router.get('/game/:gameId', async (req, res) => {
   try {
     const { gameId } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     const query = `
       SELECT ts.*, t.name as team_name, t.abbreviation as team_abbr
@@ -47,7 +45,7 @@ router.get('/game/:gameId', async (req, res) => {
       ORDER BY ts.team_id
     `;
     
-    db.all(query, [gameId], (err, rows) => {
+    db.all(query, [gameId], (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -64,7 +62,7 @@ router.get('/players/:gameId', async (req, res) => {
   try {
     const { gameId } = req.params;
     const { teamId } = req.query;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     let query = `
       SELECT ps.*, p.name as player_name, p.position, p.jersey_number,
@@ -84,7 +82,7 @@ router.get('/players/:gameId', async (req, res) => {
     
     query += ' ORDER BY ps.team_id, p.name';
     
-    db.all(query, params, (err, rows) => {
+    db.all(query, params, (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -100,7 +98,7 @@ router.get('/players/:gameId', async (req, res) => {
 router.get('/season/:season/:type', async (req, res) => {
   try {
     const { season, type } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     // Get top rushing teams
     const rushingQuery = `
@@ -133,13 +131,13 @@ router.get('/season/:season/:type', async (req, res) => {
     `;
     
     // Execute both queries
-    db.all(rushingQuery, [season, type], (err, rushingStats) => {
+    db.all(rushingQuery, [season, type], (err: any, rushingStats: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
       }
       
-      db.all(passingQuery, [season, type], (err, passingStats) => {
+      db.all(passingQuery, [season, type], (err: any, passingStats: any) => {
         if (err) {
           res.status(500).json({ error: err.message });
           return;
@@ -162,7 +160,7 @@ router.get('/season/:season/:type', async (req, res) => {
 router.get('/weekly/:season/:week/:type', async (req, res) => {
   try {
     const { season, week, type } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     // Get games for the week
     const gamesQuery = `
@@ -175,7 +173,7 @@ router.get('/weekly/:season/:week/:type', async (req, res) => {
       WHERE g.season = ? AND g.week = ? AND g.type = ? AND g.status = 'completed'
     `;
     
-    db.all(gamesQuery, [season, week, type], (err, games) => {
+    db.all(gamesQuery, [season, week, type], (err: any, games: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
