@@ -2,6 +2,32 @@
 
 A comprehensive web application for analyzing weekly NFL and college football games scores, statistics, and betting lines.
 
+## Deployment Options
+
+### 🚀 Quick Start: Static Web Page (No Backend Required)
+
+For the easiest deployment without any server setup, use the static version:
+
+1. **Build the static application:**
+   ```bash
+   cd client
+   npm install
+   npm run build
+   ```
+
+2. **Deploy the `build` folder** to any static hosting service (GitHub Pages, Netlify, Vercel, etc.)
+
+   Or test locally:
+   ```bash
+   npx serve -s build
+   ```
+
+✅ **All features work with realistic mock data!** See [STATIC_DEPLOYMENT.md](STATIC_DEPLOYMENT.md) for detailed instructions.
+
+### 🔧 Full Development Setup (With Backend)
+
+For development or custom data integration, follow the full setup instructions below.
+
 ## Features
 
 - **Dashboard**: Overview of recent and upcoming games with weekly analysis
@@ -22,11 +48,11 @@ A comprehensive web application for analyzing weekly NFL and college football ga
 ### Frontend
 - **React** with TypeScript
 - **React Router** for navigation
-- **Axios** for API communication
+- **Mock API** for static deployment (or Axios for backend communication)
 - **Responsive design** with custom CSS
 - **Modern UI** components
 
-## Getting Started
+## Getting Started (Full Development Setup)
 
 ### Prerequisites
 - Node.js (v16 or higher)
