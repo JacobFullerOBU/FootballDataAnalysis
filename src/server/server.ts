@@ -31,6 +31,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
+// Store database instance in app locals
+app.locals.database = database;
+
 // Serve static files from client build
 app.use(express.static(path.join(__dirname, '../../client/dist')));
 
