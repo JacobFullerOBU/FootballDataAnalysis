@@ -6,6 +6,7 @@ import Games from './pages/Games';
 import Teams from './pages/Teams';
 import Analytics from './pages/Analytics';
 import Betting from './pages/Betting';
+import BettingAnalysis from './pages/BettingAnalysis';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/teams" element={<Teams />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/betting" element={<Betting />} />
+            <Route path="/betting/analysis/:gameId" element={<BettingAnalysis />} />
           </Routes>
         </main>
       </div>

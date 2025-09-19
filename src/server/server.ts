@@ -9,6 +9,8 @@ import gamesRouter from './routes/games';
 import teamsRouter from './routes/teams';
 import statsRouter from './routes/stats';
 import bettingRouter from './routes/betting';
+import bettingSimpleRouter from './routes/betting-simple';
+import bettingMockRouter from './routes/betting-mock';
 import { Database } from './services/database';
 import { DataFetcher } from './services/dataFetcher';
 
@@ -42,6 +44,8 @@ app.use('/api/games', gamesRouter);
 app.use('/api/teams', teamsRouter);
 app.use('/api/stats', statsRouter);
 app.use('/api/betting', bettingRouter);
+app.use('/api/betting-simple', bettingSimpleRouter);
+app.use('/api/betting-mock', bettingMockRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

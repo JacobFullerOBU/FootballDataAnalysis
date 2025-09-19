@@ -1,6 +1,8 @@
 import express from 'express';
+import { Database } from '../services/database';
 
 const router = express.Router();
+const database = new Database();
 
 // Get all games for a specific week and season
 router.get('/week/:season/:week', async (req, res) => {
@@ -8,7 +10,7 @@ router.get('/week/:season/:week', async (req, res) => {
     const { season, week } = req.params;
     const { type } = req.query; // 'nfl' or 'college'
     
-    const db = req.app.locals.database.getDatabase();
+    const db = database.getDatabase();
     
     let query = `
       SELECT g.*, 
@@ -45,7 +47,7 @@ router.get('/week/:season/:week', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const db = req.app.locals.database.getDatabase();
+    const db = database.getDatabase();
     
     const query = `
       SELECT g.*, 
