@@ -1,14 +1,12 @@
 import express from 'express';
-import { Database } from '../services/database';
 
 const router = express.Router();
-const database = new Database();
 
 // Get all teams
 router.get('/', async (req, res) => {
   try {
     const { type } = req.query; // 'nfl' or 'college'
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     let query = 'SELECT * FROM teams';
     const params: any[] = [];
@@ -20,7 +18,7 @@ router.get('/', async (req, res) => {
     
     query += ' ORDER BY name';
     
-    db.all(query, params, (err, rows) => {
+    db.all(query, params, (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -36,9 +34,9 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
-    db.get('SELECT * FROM teams WHERE id = ?', [id], (err, row) => {
+    db.get('SELECT * FROM teams WHERE id = ?', [id], (err: any, row: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -59,7 +57,7 @@ router.get('/:id/games/recent/:limit?', async (req, res) => {
   try {
     const { id } = req.params;
     const limit = parseInt(req.params.limit as string) || 10;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     const query = `
       SELECT g.*, 
@@ -78,7 +76,7 @@ router.get('/:id/games/recent/:limit?', async (req, res) => {
       LIMIT ?
     `;
     
-    db.all(query, [id, id, id, limit], (err, rows) => {
+    db.all(query, [id, id, id, limit], (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -95,7 +93,7 @@ router.get('/:id/games/upcoming/:limit?', async (req, res) => {
   try {
     const { id } = req.params;
     const limit = parseInt(req.params.limit as string) || 10;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     const query = `
       SELECT g.*, 
@@ -115,7 +113,7 @@ router.get('/:id/games/upcoming/:limit?', async (req, res) => {
       LIMIT ?
     `;
     
-    db.all(query, [id, id, id, limit], (err, rows) => {
+    db.all(query, [id, id, id, limit], (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;

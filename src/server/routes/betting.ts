@@ -1,14 +1,12 @@
 import express from 'express';
-import { Database } from '../services/database';
 
 const router = express.Router();
-const database = new Database();
 
 // Get betting lines for a specific game
 router.get('/game/:gameId', async (req, res) => {
   try {
     const { gameId } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     const query = `
       SELECT bl.*, 
@@ -23,7 +21,7 @@ router.get('/game/:gameId', async (req, res) => {
       ORDER BY bl.timestamp DESC
     `;
     
-    db.all(query, [gameId], (err, rows) => {
+    db.all(query, [gameId], (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -40,7 +38,7 @@ router.get('/upcoming/:type?', async (req, res) => {
   try {
     const { type } = req.params;
     const limit = parseInt(req.query.limit as string) || 10;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     let query = `
       SELECT DISTINCT bl.game_id,
@@ -69,7 +67,7 @@ router.get('/upcoming/:type?', async (req, res) => {
     `;
     params.push(limit);
     
-    db.all(query, params, (err, gameRows) => {
+    db.all(query, params, (err: any, gameRows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -91,7 +89,7 @@ router.get('/upcoming/:type?', async (req, res) => {
         ORDER BY bl.game_id, bl.timestamp DESC
       `;
       
-      db.all(linesQuery, gameIds, (err, linesRows) => {
+      db.all(linesQuery, gameIds, (err: any, linesRows: any) => {
         if (err) {
           res.status(500).json({ error: err.message });
           return;
@@ -127,7 +125,7 @@ router.get('/upcoming/:type?', async (req, res) => {
 router.get('/compare/:gameId', async (req, res) => {
   try {
     const { gameId } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     const query = `
       SELECT bookmaker,
@@ -138,7 +136,7 @@ router.get('/compare/:gameId', async (req, res) => {
       ORDER BY bookmaker, timestamp DESC
     `;
     
-    db.all(query, [gameId], (err, rows) => {
+    db.all(query, [gameId], (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -194,7 +192,7 @@ router.get('/compare/:gameId', async (req, res) => {
 router.get('/trends/team/:teamId/:season', async (req, res) => {
   try {
     const { teamId, season } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     const query = `
       SELECT g.id as game_id, g.week, g.home_score, g.away_score,
@@ -221,7 +219,7 @@ router.get('/trends/team/:teamId/:season', async (req, res) => {
       ORDER BY g.week
     `;
     
-    db.all(query, [teamId, teamId, teamId, teamId, teamId, season], (err, rows) => {
+    db.all(query, [teamId, teamId, teamId, teamId, teamId, season], (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;

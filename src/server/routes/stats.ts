@@ -1,14 +1,12 @@
 import express from 'express';
-import { Database } from '../services/database';
 
 const router = express.Router();
-const database = new Database();
 
 // Get team stats for a specific game
 router.get('/team/:gameId/:teamId', async (req, res) => {
   try {
     const { gameId, teamId } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     const query = `
       SELECT ts.*, t.name as team_name, t.abbreviation as team_abbr
@@ -17,7 +15,7 @@ router.get('/team/:gameId/:teamId', async (req, res) => {
       WHERE ts.game_id = ? AND ts.team_id = ?
     `;
     
-    db.get(query, [gameId, teamId], (err, row) => {
+    db.get(query, [gameId, teamId], (err: any, row: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -37,7 +35,7 @@ router.get('/team/:gameId/:teamId', async (req, res) => {
 router.get('/game/:gameId', async (req, res) => {
   try {
     const { gameId } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     const query = `
       SELECT ts.*, t.name as team_name, t.abbreviation as team_abbr
@@ -47,7 +45,7 @@ router.get('/game/:gameId', async (req, res) => {
       ORDER BY ts.team_id
     `;
     
-    db.all(query, [gameId], (err, rows) => {
+    db.all(query, [gameId], (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -64,7 +62,7 @@ router.get('/players/:gameId', async (req, res) => {
   try {
     const { gameId } = req.params;
     const { teamId } = req.query;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     let query = `
       SELECT ps.*, p.name as player_name, p.position, p.jersey_number,
@@ -84,7 +82,7 @@ router.get('/players/:gameId', async (req, res) => {
     
     query += ' ORDER BY ps.team_id, p.name';
     
-    db.all(query, params, (err, rows) => {
+    db.all(query, params, (err: any, rows: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -100,7 +98,7 @@ router.get('/players/:gameId', async (req, res) => {
 router.get('/season/:season/:type', async (req, res) => {
   try {
     const { season, type } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     // Get top rushing teams
     const rushingQuery = `
@@ -133,13 +131,13 @@ router.get('/season/:season/:type', async (req, res) => {
     `;
     
     // Execute both queries
-    db.all(rushingQuery, [season, type], (err, rushingStats) => {
+    db.all(rushingQuery, [season, type], (err: any, rushingStats: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
       }
       
-      db.all(passingQuery, [season, type], (err, passingStats) => {
+      db.all(passingQuery, [season, type], (err: any, passingStats: any) => {
         if (err) {
           res.status(500).json({ error: err.message });
           return;
@@ -162,7 +160,7 @@ router.get('/season/:season/:type', async (req, res) => {
 router.get('/weekly/:season/:week/:type', async (req, res) => {
   try {
     const { season, week, type } = req.params;
-    const db = database.getDatabase();
+    const db = req.app.locals.database.getDatabase();
     
     // Get games for the week
     const gamesQuery = `
@@ -175,7 +173,7 @@ router.get('/weekly/:season/:week/:type', async (req, res) => {
       WHERE g.season = ? AND g.week = ? AND g.type = ? AND g.status = 'completed'
     `;
     
-    db.all(gamesQuery, [season, week, type], (err, games) => {
+    db.all(gamesQuery, [season, week, type], (err: any, games: any) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
@@ -222,3 +220,291 @@ router.get('/weekly/:season/:week/:type', async (req, res) => {
 });
 
 export default router;
+
+// PUT endpoint to update team stats for a specific game
+router.put('/team/:gameId/:teamId', async (req, res) => {
+  try {
+    const { gameId, teamId } = req.params;
+    const statsData = req.body;
+    const db = req.app.locals.database.getDatabase();
+    
+    // Validate required fields
+    if (!statsData || typeof statsData !== 'object') {
+      res.status(400).json({ error: 'Invalid stats data provided' });
+      return;
+    }
+    
+    // Build dynamic update query based on provided fields
+    const allowedFields = [
+      'total_yards', 'passing_yards', 'rushing_yards', 'turnovers', 
+      'penalties', 'penalty_yards', 'time_of_possession', 
+      'third_down_conversions', 'fourth_down_conversions'
+    ];
+    
+    const updateFields = [];
+    const values = [];
+    
+    for (const field of allowedFields) {
+      if (statsData[field] !== undefined) {
+        updateFields.push(`${field} = ?`);
+        values.push(statsData[field]);
+      }
+    }
+    
+    if (updateFields.length === 0) {
+      res.status(400).json({ error: 'No valid fields provided for update' });
+      return;
+    }
+    
+    values.push(gameId, teamId);
+    
+    const updateQuery = `
+      UPDATE team_stats 
+      SET ${updateFields.join(', ')}
+      WHERE game_id = ? AND team_id = ?
+    `;
+    
+    db.run(updateQuery, values, function(this: any, err: any) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      
+      if (this.changes === 0) {
+        res.status(404).json({ error: 'Team stats not found' });
+        return;
+      }
+      
+      res.json({ 
+        message: 'Team stats updated successfully',
+        gameId: parseInt(gameId),
+        teamId: parseInt(teamId),
+        updatedFields: Object.keys(statsData).filter(key => allowedFields.includes(key))
+      });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST endpoint to create new team stats
+router.post('/team', async (req, res) => {
+  try {
+    const statsData = req.body;
+    const db = req.app.locals.database.getDatabase();
+    
+    // Validate required fields
+    if (!statsData || !statsData.game_id || !statsData.team_id) {
+      res.status(400).json({ error: 'game_id and team_id are required' });
+      return;
+    }
+    
+    // Check if stats already exist for this game and team
+    const existingQuery = `
+      SELECT id FROM team_stats WHERE game_id = ? AND team_id = ?
+    `;
+    
+    db.get(existingQuery, [statsData.game_id, statsData.team_id], (err: any, row: any) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      
+      if (row) {
+        res.status(409).json({ error: 'Team stats already exist for this game. Use PUT to update.' });
+        return;
+      }
+      
+      // Prepare insert data with defaults
+      const insertData = {
+        game_id: statsData.game_id,
+        team_id: statsData.team_id,
+        total_yards: statsData.total_yards || 0,
+        passing_yards: statsData.passing_yards || 0,
+        rushing_yards: statsData.rushing_yards || 0,
+        turnovers: statsData.turnovers || 0,
+        penalties: statsData.penalties || 0,
+        penalty_yards: statsData.penalty_yards || 0,
+        time_of_possession: statsData.time_of_possession || null,
+        third_down_conversions: statsData.third_down_conversions || null,
+        fourth_down_conversions: statsData.fourth_down_conversions || null
+      };
+      
+      const insertQuery = `
+        INSERT INTO team_stats (
+          game_id, team_id, total_yards, passing_yards, rushing_yards,
+          turnovers, penalties, penalty_yards, time_of_possession,
+          third_down_conversions, fourth_down_conversions
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      
+      const values = [
+        insertData.game_id, insertData.team_id, insertData.total_yards,
+        insertData.passing_yards, insertData.rushing_yards, insertData.turnovers,
+        insertData.penalties, insertData.penalty_yards, insertData.time_of_possession,
+        insertData.third_down_conversions, insertData.fourth_down_conversions
+      ];
+      
+      db.run(insertQuery, values, function(this: any, err: any) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        
+        res.status(201).json({
+          message: 'Team stats created successfully',
+          id: this.lastID,
+          gameId: insertData.game_id,
+          teamId: insertData.team_id
+        });
+      });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT endpoint to update player stats for a specific game
+router.put('/player/:gameId/:playerId', async (req, res) => {
+  try {
+    const { gameId, playerId } = req.params;
+    const statsData = req.body;
+    const db = req.app.locals.database.getDatabase();
+    
+    // Validate required fields
+    if (!statsData || typeof statsData !== 'object') {
+      res.status(400).json({ error: 'Invalid stats data provided' });
+      return;
+    }
+    
+    // Build dynamic update query based on provided fields
+    const allowedFields = [
+      'passing_yards', 'passing_touchdowns', 'rushing_yards', 'rushing_touchdowns',
+      'receiving_yards', 'receiving_touchdowns', 'tackles', 'sacks', 'interceptions'
+    ];
+    
+    const updateFields = [];
+    const values = [];
+    
+    for (const field of allowedFields) {
+      if (statsData[field] !== undefined) {
+        updateFields.push(`${field} = ?`);
+        values.push(statsData[field]);
+      }
+    }
+    
+    if (updateFields.length === 0) {
+      res.status(400).json({ error: 'No valid fields provided for update' });
+      return;
+    }
+    
+    values.push(gameId, playerId);
+    
+    const updateQuery = `
+      UPDATE player_stats 
+      SET ${updateFields.join(', ')}
+      WHERE game_id = ? AND player_id = ?
+    `;
+    
+    db.run(updateQuery, values, function(this: any, err: any) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      
+      if (this.changes === 0) {
+        res.status(404).json({ error: 'Player stats not found' });
+        return;
+      }
+      
+      res.json({ 
+        message: 'Player stats updated successfully',
+        gameId: parseInt(gameId),
+        playerId: parseInt(playerId),
+        updatedFields: Object.keys(statsData).filter(key => allowedFields.includes(key))
+      });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST endpoint to create new player stats
+router.post('/player', async (req, res) => {
+  try {
+    const statsData = req.body;
+    const db = req.app.locals.database.getDatabase();
+    
+    // Validate required fields
+    if (!statsData || !statsData.game_id || !statsData.player_id || !statsData.team_id) {
+      res.status(400).json({ error: 'game_id, player_id, and team_id are required' });
+      return;
+    }
+    
+    // Check if stats already exist for this game and player
+    const existingQuery = `
+      SELECT id FROM player_stats WHERE game_id = ? AND player_id = ?
+    `;
+    
+    db.get(existingQuery, [statsData.game_id, statsData.player_id], (err: any, row: any) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      
+      if (row) {
+        res.status(409).json({ error: 'Player stats already exist for this game. Use PUT to update.' });
+        return;
+      }
+      
+      // Prepare insert data with defaults
+      const insertData = {
+        game_id: statsData.game_id,
+        player_id: statsData.player_id,
+        team_id: statsData.team_id,
+        passing_yards: statsData.passing_yards || 0,
+        passing_touchdowns: statsData.passing_touchdowns || 0,
+        rushing_yards: statsData.rushing_yards || 0,
+        rushing_touchdowns: statsData.rushing_touchdowns || 0,
+        receiving_yards: statsData.receiving_yards || 0,
+        receiving_touchdowns: statsData.receiving_touchdowns || 0,
+        tackles: statsData.tackles || 0,
+        sacks: statsData.sacks || 0,
+        interceptions: statsData.interceptions || 0
+      };
+      
+      const insertQuery = `
+        INSERT INTO player_stats (
+          game_id, player_id, team_id, passing_yards, passing_touchdowns,
+          rushing_yards, rushing_touchdowns, receiving_yards, receiving_touchdowns,
+          tackles, sacks, interceptions
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      
+      const values = [
+        insertData.game_id, insertData.player_id, insertData.team_id,
+        insertData.passing_yards, insertData.passing_touchdowns,
+        insertData.rushing_yards, insertData.rushing_touchdowns,
+        insertData.receiving_yards, insertData.receiving_touchdowns,
+        insertData.tackles, insertData.sacks, insertData.interceptions
+      ];
+      
+      db.run(insertQuery, values, function(this: any, err: any) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        
+        res.status(201).json({
+          message: 'Player stats created successfully',
+          id: this.lastID,
+          gameId: insertData.game_id,
+          playerId: insertData.player_id,
+          teamId: insertData.team_id
+        });
+      });
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
