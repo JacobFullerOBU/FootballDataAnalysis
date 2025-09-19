@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { bettingAPI } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -89,12 +90,20 @@ const Betting: React.FC = () => {
                     {new Date(game.game_date).toLocaleDateString()} • Week {game.week}
                   </p>
                 </div>
-                <div className={`px-2 py-1 rounded text-xs font-medium ${
-                  game.type === 'nfl' 
-                    ? 'bg-nfl-100 text-nfl-800' 
-                    : 'bg-college-100 text-college-800'
-                }`}>
-                  {game.type?.toUpperCase()}
+                <div className="flex items-center space-x-3">
+                  <Link
+                    to={`/betting/analysis/${game.game_id}`}
+                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                  >
+                    Analyze
+                  </Link>
+                  <div className={`px-2 py-1 rounded text-xs font-medium ${
+                    game.type === 'nfl' 
+                      ? 'bg-nfl-100 text-nfl-800' 
+                      : 'bg-college-100 text-college-800'
+                  }`}>
+                    {game.type?.toUpperCase()}
+                  </div>
                 </div>
               </div>
 

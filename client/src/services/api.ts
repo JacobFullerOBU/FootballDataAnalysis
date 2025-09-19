@@ -39,7 +39,7 @@ export const gamesAPI = {
   },
   
   getById: async (id: number): Promise<Game> => {
-    const response = await api.get(`/games/${id}`);
+    const response = await api.get(`/betting-mock/mock-game/${id}`);
     return response.data as Game;
   },
   
@@ -85,17 +85,17 @@ export const statsAPI = {
 // Betting API
 export const bettingAPI = {
   getGameLines: async (gameId: number): Promise<BettingLine[]> => {
-    const response = await api.get(`/betting/game/${gameId}`);
+    const response = await api.get(`/betting-mock/mock-lines/${gameId}`);
     return response.data as BettingLine[];
   },
   
   getUpcomingLines: async (type?: 'nfl' | 'college' | 'all', limit?: number) => {
-    const response = await api.get(`/betting/upcoming/${type || 'all'}`, { params: { limit } });
+    const response = await api.get(`/betting-mock/mock-upcoming`);
     return response.data;
   },
   
   getLineComparison: async (gameId: number) => {
-    const response = await api.get(`/betting/compare/${gameId}`);
+    const response = await api.get(`/betting-mock/mock-compare/${gameId}`);
     return response.data;
   },
   

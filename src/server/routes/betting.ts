@@ -42,10 +42,12 @@ router.get('/upcoming/:type?', async (req, res) => {
     const limit = parseInt(req.query.limit as string) || 10;
     const db = database.getDatabase();
     
+    console.log('Fetching upcoming betting lines with type:', type, 'limit:', limit);
+    
     let query = `
       SELECT DISTINCT bl.game_id,
              MAX(bl.timestamp) as latest_timestamp,
-             g.game_date, g.week, g.season,
+             g.game_date, g.week, g.season, g.type,
              ht.name as home_team_name, ht.abbreviation as home_team_abbr,
              at.name as away_team_name, at.abbreviation as away_team_abbr
       FROM betting_lines bl
@@ -69,11 +71,17 @@ router.get('/upcoming/:type?', async (req, res) => {
     `;
     params.push(limit);
     
-    db.all(query, params, (err, gameRows) => {
+    console.log('Query:', query);
+    console.log('Params:', params);
+    
+    db.all(query, params, (err: any, gameRows: any) => {
       if (err) {
+        console.error('Database error:', err);
         res.status(500).json({ error: err.message });
         return;
       }
+      
+      console.log('Found games:', gameRows?.length);
       
       if (gameRows.length === 0) {
         res.json([]);
@@ -91,11 +99,14 @@ router.get('/upcoming/:type?', async (req, res) => {
         ORDER BY bl.game_id, bl.timestamp DESC
       `;
       
-      db.all(linesQuery, gameIds, (err, linesRows) => {
+      db.all(linesQuery, gameIds, (err: any, linesRows: any) => {
         if (err) {
+          console.error('Lines query error:', err);
           res.status(500).json({ error: err.message });
           return;
         }
+        
+        console.log('Found lines:', linesRows?.length);
         
         // Group lines by game
         const gamesWithLines = gameRows.map((game: any) => {
