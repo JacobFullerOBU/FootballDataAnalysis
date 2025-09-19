@@ -9,6 +9,8 @@ import gamesRouter from './routes/games';
 import teamsRouter from './routes/teams';
 import statsRouter from './routes/stats';
 import bettingRouter from './routes/betting';
+import bettingSimpleRouter from './routes/betting-simple';
+import bettingMockRouter from './routes/betting-mock';
 import { Database } from './services/database';
 import { DataFetcher } from './services/dataFetcher';
 
@@ -35,13 +37,15 @@ app.use(logger);
 app.locals.database = database;
 
 // Serve static files from client build
-app.use(express.static(path.join(__dirname, '../../client/dist')));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 // API Routes
 app.use('/api/games', gamesRouter);
 app.use('/api/teams', teamsRouter);
 app.use('/api/stats', statsRouter);
 app.use('/api/betting', bettingRouter);
+app.use('/api/betting-simple', bettingSimpleRouter);
+app.use('/api/betting-mock', bettingMockRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -54,7 +58,7 @@ app.get('/api/health', (req, res) => {
 
 // Serve client for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
 // Error handling

@@ -27,6 +27,25 @@ For the easiest deployment without any server setup, use the static version:
 ### 🔧 Full Development Setup (With Backend)
 
 For development or custom data integration, follow the full setup instructions below.
+=======
+## 🎯 Demo Available!
+
+**Try the demo with sample data right now!**
+
+```bash
+git clone https://github.com/JacobFullerOBU/FootballDataAnalysis.git
+cd FootballDataAnalysis
+./setup-demo.sh
+npm start
+```
+
+The demo includes:
+- 34 teams (20 NFL + 14 college)
+- 10 sample games (upcoming and completed)
+- Betting lines from multiple bookmakers
+- Complete API endpoints
+
+See [DEMO.md](DEMO.md) for detailed demo documentation.
 
 ## Features
 
@@ -58,7 +77,16 @@ For development or custom data integration, follow the full setup instructions b
 - Node.js (v16 or higher)
 - npm or yarn
 
-### Installation
+### Quick Setup (Recommended)
+
+**Option 1: One-command setup**
+```bash
+git clone https://github.com/JacobFullerOBU/FootballDataAnalysis.git
+cd FootballDataAnalysis
+./quick-start.sh
+```
+
+**Option 2: Manual npm setup**
 
 1. Clone the repository:
 ```bash
@@ -66,27 +94,19 @@ git clone https://github.com/JacobFullerOBU/FootballDataAnalysis.git
 cd FootballDataAnalysis
 ```
 
-2. Install backend dependencies:
+2. Install all dependencies and set up the project:
 ```bash
 npm install
 ```
 
-3. Install frontend dependencies:
-```bash
-cd client
-npm install
-cd ..
-```
-
-4. Set up environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
+Both methods will automatically:
+- Install backend dependencies
+- Install frontend dependencies 
+- Set up your environment file from `.env.example`
 
 ### Development
 
-1. Start the development server (both backend and frontend):
+Start the development server (both backend and frontend):
 ```bash
 npm run dev
 ```
@@ -95,7 +115,9 @@ This will start:
 - Backend server on http://localhost:3001
 - Frontend development server on http://localhost:3000
 
-2. Or start them separately:
+### Alternative Development Commands
+
+Start them separately if needed:
 
 Backend only:
 ```bash
@@ -106,6 +128,34 @@ Frontend only:
 ```bash
 npm run dev:client
 ```
+
+### Manual Setup (If Needed)
+
+If you prefer to set up manually or need to troubleshoot:
+
+1. Install backend dependencies:
+```bash
+npm install
+```
+
+2. Install frontend dependencies:
+```bash
+npm run install:client
+```
+
+3. Set up environment variables:
+```bash
+npm run setup:env
+```
+
+### Additional Commands
+
+- **Build for production**: `npm run build`
+- **Start production server**: `npm start` 
+- **Clean everything**: `npm run clean`
+- **Fresh install**: `npm run fresh-install`
+- **Run tests**: `npm test`
+- **Lint code**: `npm run lint`
 
 ### Production Build
 
